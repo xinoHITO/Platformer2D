@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour {
-	public GameObject floorCheck;
+	public float runSpeed = 5;
+	public float jumpForce = 8;
+
+//	public GameObject floorCheck;
 	public LayerMask mask;
 	public float gravity = 10;
 	public Vector2 boxSize;
@@ -14,27 +17,52 @@ public class PlayerControl : MonoBehaviour {
 	void Start () {
 		
 	}
-	
+
+	private float h;
+	private bool pressedJump;
 	// Update is called once per frame
 	void Update () {
-		float h = Input.GetAxis ("Horizontal");
+		h = Input.GetAxis ("Horizontal");
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			pressedJump = true;	
+		}
 
-		playerVelocity = new Vector2 (h * 2, 0);
+	}
 
-		Collider2D theCollider = Physics2D.OverlapBox (transform.position, boxSize, 0,mask.value);
+	void FixedUpdate(){
+		
 
-	//	RaycastHit2D hitInfo = Physics2D.Linecast (transform.position, floorCheck.transform.position,mask.value);
+		playerVelocity = new Vector2 (h * runSpeed, 0);
 
-		//estas en el aire
-		if (theCollider == null) {
-			verticalSpeed -= gravity * Time.deltaTime;
-		} else {//estas en el piso
-			verticalSpeed = -0.2f;
+		Vector2 downDirection = new Vector2 (0, -1);
+		RaycastHit2D hitInfo = Physics2D.BoxCast (transform.position, boxSize, 0, downDirection, 0, mask.value);
+
+
+
+		Debug.Log (hitInfo.normal);
+
+		//chocaste tu cabeza con el techo
+		if (hitInfo.normal.y < -0.5f) {
+			verticalSpeed = 0;
 		}
 
 
+		//estas en el piso
+		if (hitInfo.normal.y > 0.5f) {
+			verticalSpeed = -0.2f;
 
-		Debug.Log (verticalSpeed);
+			if (pressedJump) {
+				verticalSpeed = jumpForce;
+				pressedJump = false;
+			}	
+		} 
+
+		//estas en el aire
+		if (hitInfo.normal.y <= 0.5f || hitInfo.collider == null) {
+			verticalSpeed -= gravity * Time.deltaTime;
+		}
+
+		//	Debug.Log (verticalSpeed);
 
 		playerVelocity.y = verticalSpeed;
 		/*
@@ -48,7 +76,9 @@ public class PlayerControl : MonoBehaviour {
 		GetComponent<Rigidbody2D> ().velocity = playerVelocity;
 	}
 
+
 	void OnDrawGizmos(){
 		Gizmos.DrawWireCube (transform.position, boxSize);
+
 	}
 }
