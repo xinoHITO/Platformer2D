@@ -9,9 +9,11 @@ public class PlayerControl : MonoBehaviour {
 //	public GameObject floorCheck;
 	public LayerMask mask;
 	public float gravity = 10;
-	public Vector2 boxSize;
+	public Vector2 verticalBoxSize;
+	public Vector2 horizontalBoxSize;
 	private Vector2 playerVelocity;
 	private float verticalSpeed;
+	private bool isGrounded;
 
 	// Use this for initialization
 	void Start () {
@@ -23,8 +25,19 @@ public class PlayerControl : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		h = Input.GetAxis ("Horizontal");
-		if (Input.GetKeyDown (KeyCode.Space)) {
+		if (Input.GetKeyDown (KeyCode.Space) && isGrounded) {
 			pressedJump = true;	
+		}
+		float absH = Mathf.Abs (h);
+		float speedAnim = GetComponent<Animator> ().GetFloat ("speed");
+		float result = Mathf.Lerp (speedAnim, absH, Time.deltaTime * 20);
+		GetComponent<Animator> ().SetFloat ("speed", result);
+
+		if (h>0) {
+			GetComponent<SpriteRenderer> ().flipX = false;
+		}
+		if (h<0) {
+			GetComponent<SpriteRenderer> ().flipX = true;
 		}
 
 	}
@@ -35,7 +48,7 @@ public class PlayerControl : MonoBehaviour {
 		playerVelocity = new Vector2 (h * runSpeed, 0);
 
 		Vector2 downDirection = new Vector2 (0, -1);
-		RaycastHit2D hitInfo = Physics2D.BoxCast (transform.position, boxSize, 0, downDirection, 0, mask.value);
+		RaycastHit2D hitInfo = Physics2D.BoxCast (transform.position, verticalBoxSize, 0, downDirection, 0, mask.value);
 
 
 
@@ -49,8 +62,8 @@ public class PlayerControl : MonoBehaviour {
 
 		//estas en el piso
 		if (hitInfo.normal.y > 0.5f) {
+			isGrounded = true;
 			verticalSpeed = -0.2f;
-
 			if (pressedJump) {
 				verticalSpeed = jumpForce;
 				pressedJump = false;
@@ -58,8 +71,25 @@ public class PlayerControl : MonoBehaviour {
 		} 
 
 		//estas en el aire
-		if (hitInfo.normal.y <= 0.5f || hitInfo.collider == null) {
+		if (hitInfo.normal.y <= 0.5f) {
+			isGrounded = false;
 			verticalSpeed -= gravity * Time.deltaTime;
+		}
+
+
+
+		hitInfo = Physics2D.BoxCast (transform.position, horizontalBoxSize, 0, downDirection, 0, mask.value);
+
+		if (hitInfo.normal.x < -0.5f) {//si te chocaste por la derecha
+			if (h>0) {	//y estas tratando de que el player se mueva hacia la derecha
+				playerVelocity.x = 0; //frenamos el movimiento horizontal
+			}
+		}
+
+		if (hitInfo.normal.x > 0.5f) {//si te chocaste por la izquierda
+			if (h<0) {	//y estas tratando de que el player se mueva hacia la izquierda
+				playerVelocity.x = 0; //frenamos el movimiento horizontal
+			}
 		}
 
 		//	Debug.Log (verticalSpeed);
@@ -78,7 +108,8 @@ public class PlayerControl : MonoBehaviour {
 
 
 	void OnDrawGizmos(){
-		Gizmos.DrawWireCube (transform.position, boxSize);
-
+		Gizmos.DrawWireCube (transform.position, verticalBoxSize);
+		Gizmos.color = Color.red;//todos los gizmos que dibujes debajo de esta linea seran de color rojo
+		Gizmos.DrawWireCube (transform.position, horizontalBoxSize);
 	}
 }
