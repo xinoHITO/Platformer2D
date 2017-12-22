@@ -22,24 +22,54 @@ public class PlayerControl : MonoBehaviour {
 
 	private float h;
 	private bool pressedJump;
+
+	public bool canControl;
 	// Update is called once per frame
 	void Update () {
-		h = Input.GetAxis ("Horizontal");
-		if (Input.GetKeyDown (KeyCode.Space) && isGrounded) {
-			pressedJump = true;	
-		}
-		float absH = Mathf.Abs (h);
-		float speedAnim = GetComponent<Animator> ().GetFloat ("speed");
-		float result = Mathf.Lerp (speedAnim, absH, Time.deltaTime * 20);
-		GetComponent<Animator> ().SetFloat ("speed", result);
+		ReceiveInputs ();
 
+		ManageAnimator ();
+
+		ManageFlipping ();
+	}
+
+	void ReceiveInputs(){
+		if (canControl) {
+			h = Input.GetAxis ("Horizontal");
+			if (Input.GetKeyDown (KeyCode.Space) && isGrounded) {
+				pressedJump = true;	
+			}
+		} else {
+			//si pierdes el control del player... forzamos a que h valga cero para que ya no se mueva el player
+			h = 0;
+		}
+
+	}
+
+	void ManageAnimator(){
+		float absH = Mathf.Abs (h);
+		float speedAnim = GetComponentInChildren<Animator> ().GetFloat ("speed");
+		float result = Mathf.Lerp (speedAnim, absH, Time.deltaTime * 20);
+		GetComponentInChildren<Animator> ().SetFloat ("speed", result);
+
+		//ataque del player
+		if (canControl) {
+			if (Input.GetMouseButtonDown(0)) {
+				if (isGrounded) {
+					GetComponentInChildren<Animator> ().SetTrigger ("attack");	
+				}
+			}
+		}
+
+	}
+
+	void ManageFlipping(){
 		if (h>0) {
-			GetComponent<SpriteRenderer> ().flipX = false;
+			GetComponentInChildren<SpriteRenderer> ().flipX = false;
 		}
 		if (h<0) {
-			GetComponent<SpriteRenderer> ().flipX = true;
+			GetComponentInChildren<SpriteRenderer> ().flipX = true;
 		}
-
 	}
 
 	void FixedUpdate(){
@@ -95,14 +125,7 @@ public class PlayerControl : MonoBehaviour {
 		//	Debug.Log (verticalSpeed);
 
 		playerVelocity.y = verticalSpeed;
-		/*
-		if (Input.GetKey(KeyCode.D)) {
-			playerVelocity = new Vector2 (2, 0);
-		}
-		if (Input.GetKey(KeyCode.A)) {
-			playerVelocity = new Vector2 (-2, 0);
-		}
-		*/
+
 		GetComponent<Rigidbody2D> ().velocity = playerVelocity;
 	}
 
