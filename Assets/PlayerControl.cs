@@ -15,9 +15,11 @@ public class PlayerControl : MonoBehaviour {
 	private float verticalSpeed;
 	private bool isGrounded;
 
+	private Animator _animator;
+
 	// Use this for initialization
 	void Start () {
-		
+		_animator = GetComponentInChildren<Animator> ();
 	}
 
 	private float h;
@@ -48,19 +50,22 @@ public class PlayerControl : MonoBehaviour {
 
 	void ManageAnimator(){
 		float absH = Mathf.Abs (h);
-		float speedAnim = GetComponentInChildren<Animator> ().GetFloat ("speed");
+		float speedAnim = _animator.GetFloat ("speed");
 		float result = Mathf.Lerp (speedAnim, absH, Time.deltaTime * 20);
-		GetComponentInChildren<Animator> ().SetFloat ("speed", result);
+		_animator.SetFloat ("speed", result);
 
 		//ataque del player
 		if (canControl) {
 			if (Input.GetMouseButtonDown(0)) {
 				if (isGrounded) {
-					GetComponentInChildren<Animator> ().SetTrigger ("attack");	
+					_animator.SetTrigger ("attack");	
 				}
 			}
 		}
 
+
+		_animator.SetBool ("isGrounded", isGrounded);
+		_animator.SetFloat ("verticalSpeed", verticalSpeed);
 	}
 
 	void ManageFlipping(){
@@ -82,7 +87,7 @@ public class PlayerControl : MonoBehaviour {
 
 
 
-		Debug.Log (hitInfo.normal);
+//		Debug.Log (hitInfo.normal);
 
 		//chocaste tu cabeza con el techo
 		if (hitInfo.normal.y < -0.5f) {

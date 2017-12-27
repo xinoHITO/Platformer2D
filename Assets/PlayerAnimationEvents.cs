@@ -6,6 +6,7 @@ public class PlayerAnimationEvents : MonoBehaviour {
 	public GameObject _player;
 
 	public GameObject _rightHitbox;
+	public GameObject _leftHitbox;
 	// Use this for initialization
 	void Start () {
 		
@@ -25,10 +26,21 @@ public class PlayerAnimationEvents : MonoBehaviour {
 	}
 
 	void ActivateHitbox(){
-		_rightHitbox.SetActive (true);
+		bool flipX = GetComponent<SpriteRenderer> ().flipX;
+		//si estas mirando a la izquierda
+		if (flipX) {
+			//solo prendemos el hitbox izquierdo
+			_leftHitbox.SetActive (true);
+		} else {//si estas mirando a la derecha
+			//solo prendemos el hitbox derecho
+			_rightHitbox.SetActive (true);
+		}
+
 	}
 
 	void DeactivateHitbox(){
+		//apagamos ambos hitboxes
+		_leftHitbox.SetActive (false);
 		_rightHitbox.SetActive (false);
 	}
 }
