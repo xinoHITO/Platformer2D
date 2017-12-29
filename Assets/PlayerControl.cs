@@ -24,8 +24,11 @@ public class PlayerControl : MonoBehaviour {
 
 	private float h;
 	private bool pressedJump;
+	private int jumpCounter;
 
 	public bool canControl;
+	public bool canAttack;
+
 	// Update is called once per frame
 	void Update () {
 		ReceiveInputs ();
@@ -36,15 +39,19 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	void ReceiveInputs(){
+
 		if (canControl) {
 			h = Input.GetAxis ("Horizontal");
-			if (Input.GetKeyDown (KeyCode.Space) && isGrounded) {
+			//usamos el jumpCounter para saber cuantos saltos hemos hecho
+			if (Input.GetKeyDown (KeyCode.Space) && jumpCounter < 2) {
 				pressedJump = true;	
+				jumpCounter++;
 			}
 		} else {
 			//si pierdes el control del player... forzamos a que h valga cero para que ya no se mueva el player
 			h = 0;
 		}
+
 
 	}
 
@@ -55,11 +62,9 @@ public class PlayerControl : MonoBehaviour {
 		_animator.SetFloat ("speed", result);
 
 		//ataque del player
-		if (canControl) {
+		if (canAttack) {
 			if (Input.GetMouseButtonDown(0)) {
-				if (isGrounded) {
-					_animator.SetTrigger ("attack");	
-				}
+				_animator.SetTrigger ("attack");
 			}
 		}
 
@@ -97,16 +102,30 @@ public class PlayerControl : MonoBehaviour {
 
 		//estas en el piso
 		if (hitInfo.normal.y > 0.5f) {
+			//si isGrounded estaba en falso pero el boxcast tocó el piso... quiere decir que
+			//acabamos de aterrizar
+			if (!isGrounded) {
+				//reseteamos el contador de salto
+				jumpCounter = 0;
+			}
 			isGrounded = true;
 			verticalSpeed = -0.2f;
-			if (pressedJump) {
-				verticalSpeed = jumpForce;
-				pressedJump = false;
-			}	
 		} 
+
+		//el salto puede darse en el aire como en el piso (gracias al doble salto)
+		if (pressedJump) {
+			verticalSpeed = jumpForce;
+			pressedJump = false;
+		}
 
 		//estas en el aire
 		if (hitInfo.normal.y <= 0.5f) {
+			//si isGrounded es true pero el boxcast dice que estamos en el aire entonces significa
+			//que nos acabamos de dejar caer de un precipicio
+			if (isGrounded) {
+				//si te dejas caer ... seteamos el contador en uno para evitar que hagas 2 saltos en el aire
+				jumpCounter = 1;
+			}
 			isGrounded = false;
 			verticalSpeed -= gravity * Time.deltaTime;
 		}

@@ -25,6 +25,14 @@ public class PlayerAnimationEvents : MonoBehaviour {
 		_player.GetComponent<PlayerControl> ().canControl = false;
 	}
 
+	void ActivateCanAttack(){
+		_player.GetComponent<PlayerControl> ().canAttack = true;
+	}
+
+	void DeactivateCanAttack(){
+		_player.GetComponent<PlayerControl> ().canAttack = false;
+	}
+
 	void ActivateHitbox(){
 		bool flipX = GetComponent<SpriteRenderer> ().flipX;
 		//si estas mirando a la izquierda
