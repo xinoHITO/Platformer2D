@@ -6,7 +6,21 @@ public class PlayerControl : MonoBehaviour {
 	public float runSpeed = 5;
 	public float jumpForce = 8;
 
-//	public GameObject floorCheck;
+	public float dashTime = 0.8f;//la duracion del dash
+	public float dashSpeed = 8;  //la velocidad del player mientras esta en el dash
+	private float targetDashSpeed;
+	private float currentDashSpeed;
+	/***************
+	public enum PlayerState
+	{
+		Normal,
+		Attack,
+		Dash
+	}
+	public PlayerState playerState;
+	****************/
+	public bool isPlayerDashing = false;
+
 	public LayerMask mask;
 	public float gravity = 10;
 	public Vector2 verticalBoxSize;
@@ -16,15 +30,20 @@ public class PlayerControl : MonoBehaviour {
 	private bool isGrounded;
 
 	private Animator _animator;
+	private Health _healthScript;
+	private SpriteRenderer _spriteRenderer;
 
 	// Use this for initialization
 	void Start () {
 		_animator = GetComponentInChildren<Animator> ();
+		_healthScript = GetComponent<Health> ();
+		_spriteRenderer = GetComponentInChildren<SpriteRenderer> ();
 	}
 
 	private float h;
 	private bool pressedJump;
 	private int jumpCounter;
+	private bool pressedDash;
 
 	public bool canControl;
 	public bool canAttack;
@@ -33,20 +52,37 @@ public class PlayerControl : MonoBehaviour {
 	void Update () {
 		ReceiveInputs ();
 
+		Dash ();
+
 		ManageAnimator ();
 
 		ManageFlipping ();
+
+		ManageBlinking ();
+
+		previousHealth = _healthScript._currentHealth;
 	}
 
 	void ReceiveInputs(){
 
-		if (canControl) {
-			h = Input.GetAxis ("Horizontal");
+		if (canControl|| isPlayerDashing) {
 			//usamos el jumpCounter para saber cuantos saltos hemos hecho
 			if (Input.GetKeyDown (KeyCode.Space) && jumpCounter < 2) {
 				pressedJump = true;	
 				jumpCounter++;
 			}
+		}
+
+		if (canControl) {
+			h = Input.GetAxis ("Horizontal");
+
+
+			if (isGrounded) {
+				if (Input.GetKeyDown(KeyCode.LeftShift)) {
+					pressedDash = true;
+				}
+			}
+
 		} else {
 			//si pierdes el control del player... forzamos a que h valga cero para que ya no se mueva el player
 			h = 0;
@@ -71,28 +107,109 @@ public class PlayerControl : MonoBehaviour {
 
 		_animator.SetBool ("isGrounded", isGrounded);
 		_animator.SetFloat ("verticalSpeed", verticalSpeed);
+		if (targetDashSpeed == dashSpeed) {
+			_animator.SetBool ("dash", true);	
+		} else {
+			_animator.SetBool ("dash", false);	
+		}
+
+	}
+
+	void Dash(){
+		if (pressedDash) {
+			canControl = false;
+			canAttack = false;
+			isPlayerDashing = true;
+			//al principio targetDashSpeed sera igual a la velocidad normal del dash
+			targetDashSpeed = dashSpeed;
+			//hacemos que current sea igual a target porque el cambio de velocidad debe ser instantaneo la inicio del dash
+			//solo al final sea hace un cambio gradual hacia cero
+			currentDashSpeed = targetDashSpeed;
+			Invoke ("EndDash", dashTime);
+			pressedDash = false;
+		}
+
+		//la logica de aplicar la ralentizacion solo se debe ejecutar en el piso
+		//esto permite que si saltas en medio de un dash... mantienes el momentum del dash
+		if (isGrounded) {
+			//currentDashSpeed siempre esta tratando de acercarse a targetDashSpeed
+			currentDashSpeed = Mathf.Lerp (currentDashSpeed, targetDashSpeed, Time.deltaTime * 4);
+		}
+
+		//si te sales del piso mientras haces dash... recuperas el control del player y tmb que pueda atacar (ataque en el aire)
+		if (!isGrounded) {
+			canControl = true;
+			canAttack = true;
+		}
+
+		//cuando la velocidad de dash sea casi cero... significa que ya terminamos
+		if (currentDashSpeed < 1.2f) {
+			isPlayerDashing = false;
+		}
+	}
+
+	void EndDash(){
+		targetDashSpeed = 0;
 	}
 
 	void ManageFlipping(){
-		if (h>0) {
-			GetComponentInChildren<SpriteRenderer> ().flipX = false;
+		if (canControl) {
+			if (h>0) {
+				GetComponentInChildren<SpriteRenderer> ().flipX = false;
+			}
+			if (h<0) {
+				GetComponentInChildren<SpriteRenderer> ().flipX = true;
+			}	
 		}
-		if (h<0) {
-			GetComponentInChildren<SpriteRenderer> ().flipX = true;
+	}
+
+	private Color currentColor;
+	private Color targetColor;
+	private bool isBlinking;
+	private float previousHealth;
+
+	void ManageBlinking(){
+		if (previousHealth > _healthScript._currentHealth) {
+			isBlinking = true;
+			Invoke ("StopBlinking", 0.8f);
 		}
+
+		if (isBlinking) {
+			if (currentColor.a < 0.1f) {
+				targetColor = Color.white;
+			}
+			if (currentColor.a > 0.9f) {
+				Color transparentWhite = Color.white;
+				transparentWhite.a = 0;
+				targetColor = transparentWhite;
+			}
+			currentColor = Color.Lerp (currentColor, targetColor, Time.deltaTime * 14);
+			_spriteRenderer.color = currentColor;
+		}
+
+	}
+
+	void StopBlinking(){
+		isBlinking = false;
+		_spriteRenderer.color = Color.white;
 	}
 
 	void FixedUpdate(){
 		
 
 		playerVelocity = new Vector2 (h * runSpeed, 0);
+		if (isPlayerDashing) {
+			if (GetComponentInChildren<SpriteRenderer> ().flipX == true) {
+				playerVelocity = new Vector2 (-currentDashSpeed, 0);
+			} else {
+				playerVelocity = new Vector2 (currentDashSpeed, 0);
+			}
+		}
+
 
 		Vector2 downDirection = new Vector2 (0, -1);
 		RaycastHit2D hitInfo = Physics2D.BoxCast (transform.position, verticalBoxSize, 0, downDirection, 0, mask.value);
 
-
-
-//		Debug.Log (hitInfo.normal);
 
 		//chocaste tu cabeza con el techo
 		if (hitInfo.normal.y < -0.5f) {
@@ -107,6 +224,9 @@ public class PlayerControl : MonoBehaviour {
 			if (!isGrounded) {
 				//reseteamos el contador de salto
 				jumpCounter = 0;
+				if (isPlayerDashing) {
+					isPlayerDashing = false;
+				}
 			}
 			isGrounded = true;
 			verticalSpeed = -0.2f;
