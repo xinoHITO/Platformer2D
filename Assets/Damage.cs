@@ -15,7 +15,7 @@ public class Damage : MonoBehaviour {
 		if (other.tag == targetTag) {
 			//luego obtenemos el script Health del otro
 			//y le reducimos la vida
-			other.GetComponent<Health> ()._currentHealth -= _damage;
+			other.GetComponent<Health> ().ApplyDamage(_damage,gameObject);
 		}
 	}
 }

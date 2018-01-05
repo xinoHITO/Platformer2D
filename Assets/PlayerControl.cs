@@ -29,6 +29,9 @@ public class PlayerControl : MonoBehaviour {
 	private float verticalSpeed;
 	private bool isGrounded;
 
+	private float knockback;
+	private bool knockBackToTheLeft;
+
 	private Animator _animator;
 	private Health _healthScript;
 	private SpriteRenderer _spriteRenderer;
@@ -57,6 +60,8 @@ public class PlayerControl : MonoBehaviour {
 		ManageAnimator ();
 
 		ManageFlipping ();
+
+		ManageKnockback ();
 
 		ManageBlinking ();
 
@@ -113,6 +118,12 @@ public class PlayerControl : MonoBehaviour {
 			_animator.SetBool ("dash", false);	
 		}
 
+		if (knockback > 0) {
+			_animator.SetBool ("hurt", true);
+		} else {
+			_animator.SetBool ("hurt", false);
+		}
+
 	}
 
 	void Dash(){
@@ -163,15 +174,55 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+
+	void ManageKnockback(){
+		//hemos detectado que te han golpeado
+		if (previousHealth > _healthScript._currentHealth) {
+			//comienza el knockback
+			knockback = 5;
+
+			//si te golpeas estando en el aire hay un leve rebote
+			if (!isGrounded) {
+				verticalSpeed = 2;
+			}
+
+			//pierdes el control del player
+			canControl = false;
+			//revisamos nuestra posicion con respecto al que nos hizo dano
+			//para saber si debemos empujarnos hacia la derecha o izquierda
+			if (_healthScript._lastAttacker.transform.position.x > transform.position.x) {
+				knockBackToTheLeft = true;
+			} else {
+				knockBackToTheLeft = false;
+			}
+		}
+
+		//si existe knockback
+		if (knockback > 0) {
+			//decrementamos el knockback
+			knockback -= 12 * Time.deltaTime;
+			//preguntamos si ya termino el knockback
+			if (knockback <= 0) {
+				//recuperamos el control del player
+				canControl = true;
+				knockback = 0;
+			}	
+		}
+
+	}
+
 	private Color currentColor;
 	private Color targetColor;
 	private bool isBlinking;
 	private float previousHealth;
 
 	void ManageBlinking(){
+
+		//hemos detectado que te han golpeado
 		if (previousHealth > _healthScript._currentHealth) {
+			gameObject.layer = 9;//entras al layer de invulnerabilidad
 			isBlinking = true;
-			Invoke ("StopBlinking", 0.8f);
+			Invoke ("StopBlinking", 1.6f);
 		}
 
 		if (isBlinking) {
@@ -192,6 +243,7 @@ public class PlayerControl : MonoBehaviour {
 	void StopBlinking(){
 		isBlinking = false;
 		_spriteRenderer.color = Color.white;
+		gameObject.layer = 0;//vuelves a ser vulnerable
 	}
 
 	void FixedUpdate(){
@@ -204,6 +256,15 @@ public class PlayerControl : MonoBehaviour {
 			} else {
 				playerVelocity = new Vector2 (currentDashSpeed, 0);
 			}
+		}
+
+		if (knockback > 0) {
+			if (knockBackToTheLeft) {
+				playerVelocity = new Vector2 (-knockback, 0);	
+			} else {
+				playerVelocity = new Vector2 (knockback, 0);
+			}
+
 		}
 
 
