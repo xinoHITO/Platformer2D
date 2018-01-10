@@ -51,6 +51,13 @@ public class PlayerControl : MonoBehaviour {
 	public bool canControl;
 	public bool canAttack;
 
+	private Vector2 horBoxcastNormal;
+
+
+	private bool isHugginWall;
+	private bool stickPlayerToWall;
+	private bool isInWallJump;
+
 	// Update is called once per frame
 	void Update () {
 		ReceiveInputs ();
@@ -60,6 +67,8 @@ public class PlayerControl : MonoBehaviour {
 		ManageAnimator ();
 
 		ManageFlipping ();
+
+		HugWall ();
 
 		ManageKnockback ();
 
@@ -75,6 +84,7 @@ public class PlayerControl : MonoBehaviour {
 			if (Input.GetKeyDown (KeyCode.Space) && jumpCounter < 2) {
 				pressedJump = true;	
 				jumpCounter++;
+//				Debug.Log ("pressed jump");
 			}
 		}
 
@@ -124,6 +134,8 @@ public class PlayerControl : MonoBehaviour {
 			_animator.SetBool ("hurt", false);
 		}
 
+		_animator.SetBool ("hugWall", isHugginWall);
+
 	}
 
 	void Dash(){
@@ -148,7 +160,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 		//si te sales del piso mientras haces dash... recuperas el control del player y tmb que pueda atacar (ataque en el aire)
-		if (!isGrounded) {
+		if (!isGrounded && isPlayerDashing) {
 			canControl = true;
 			canAttack = true;
 		}
@@ -161,6 +173,63 @@ public class PlayerControl : MonoBehaviour {
 
 	void EndDash(){
 		targetDashSpeed = 0;
+	}
+
+	void HugWall(){
+
+		bool newIsHuggingWall = false;
+
+		//solo puedes estar agarrado del muro en el aire
+		if (isGrounded == false) {
+			if (horBoxcastNormal.x < -0.5f) {//si te chocaste por la derecha
+				if (h>0) {	//y estas tratando de que el player se mueva hacia la derecha
+					newIsHuggingWall = true;
+				}
+			}
+
+			if (horBoxcastNormal.x > 0.5f) {//si te chocaste por la izquierda
+				if (h<0) {	//y estas tratando de que el player se mueva hacia la izquierda
+					newIsHuggingWall = true;
+				}
+			}	
+		}
+
+
+		if (stickPlayerToWall) {
+			newIsHuggingWall = true;
+		}
+
+		//si el frame anterior estaba pegado a la pared y ahora no...
+		if (isHugginWall == true && newIsHuggingWall == false) {
+			stickPlayerToWall = true;
+			newIsHuggingWall = true;
+			Invoke ("CancelStickToWall", 0.5f);
+			Debug.Log ("stick player to wall");
+		}
+
+
+		isHugginWall = newIsHuggingWall;
+
+		if (isHugginWall) {
+			jumpCounter = 1;
+		}
+		if (isHugginWall && pressedJump) {
+			canControl = false;
+			isInWallJump = true;
+			Invoke ("CancelWallJump", 0.2f);
+		}
+	}
+
+	void CancelStickToWall(){
+		stickPlayerToWall = false;
+		isHugginWall = false;
+		Debug.Log ("CANCEL stick player to wall");
+
+	}
+
+	void CancelWallJump(){
+		canControl = true;
+		isInWallJump = false;
 	}
 
 	void ManageFlipping(){
@@ -258,6 +327,19 @@ public class PlayerControl : MonoBehaviour {
 			}
 		}
 
+		//estas pegado a la pared
+		if (stickPlayerToWall) {
+			playerVelocity = new Vector2 (0,0);
+		}
+
+		if (isInWallJump) {
+			if (_spriteRenderer.flipX) {
+				playerVelocity = new Vector2 (5, 0);
+			} else {
+				playerVelocity = new Vector2 (-5, 0);
+			}
+		}
+
 		if (knockback > 0) {
 			if (knockBackToTheLeft) {
 				playerVelocity = new Vector2 (-knockback, 0);	
@@ -266,6 +348,7 @@ public class PlayerControl : MonoBehaviour {
 			}
 
 		}
+
 
 
 		Vector2 downDirection = new Vector2 (0, -1);
@@ -293,11 +376,6 @@ public class PlayerControl : MonoBehaviour {
 			verticalSpeed = -0.2f;
 		} 
 
-		//el salto puede darse en el aire como en el piso (gracias al doble salto)
-		if (pressedJump) {
-			verticalSpeed = jumpForce;
-			pressedJump = false;
-		}
 
 		//estas en el aire
 		if (hitInfo.normal.y <= 0.5f) {
@@ -309,11 +387,32 @@ public class PlayerControl : MonoBehaviour {
 			}
 			isGrounded = false;
 			verticalSpeed -= gravity * Time.deltaTime;
+			if (isHugginWall) {
+				verticalSpeed = -2;
+			}
+
+
 		}
 
 
+		//el salto puede darse en el aire como en el piso (gracias al doble salto)
+		if (pressedJump) {
+			verticalSpeed = jumpForce;
+			pressedJump = false;
+
+			if (isHugginWall) {
+				//apagamos el canControl para que isHugginWall se vuelva falso
+				canControl = false;
+				isHugginWall = false;
+				CancelStickToWall ();
+			}
+		}
+
 
 		hitInfo = Physics2D.BoxCast (transform.position, horizontalBoxSize, 0, downDirection, 0, mask.value);
+		//almacenamos la informacion de la normal en una variable global 
+		//porque la necesitaremos en otras funciones
+		horBoxcastNormal = hitInfo.normal;
 
 		if (hitInfo.normal.x < -0.5f) {//si te chocaste por la derecha
 			if (h>0) {	//y estas tratando de que el player se mueva hacia la derecha
