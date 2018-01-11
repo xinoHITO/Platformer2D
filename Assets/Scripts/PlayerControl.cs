@@ -203,7 +203,7 @@ public class PlayerControl : MonoBehaviour {
 		if (isHugginWall == true && newIsHuggingWall == false) {
 			stickPlayerToWall = true;
 			newIsHuggingWall = true;
-			Invoke ("CancelStickToWall", 0.5f);
+			Invoke ("CancelStickToWall", 0.2f);
 			Debug.Log ("stick player to wall");
 		}
 
@@ -233,6 +233,11 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	void ManageFlipping(){
+
+		if (stickPlayerToWall) {
+			return;
+		}
+
 		if (canControl) {
 			if (h>0) {
 				GetComponentInChildren<SpriteRenderer> ().flipX = false;
