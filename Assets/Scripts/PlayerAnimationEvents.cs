@@ -43,7 +43,11 @@ public class PlayerAnimationEvents : MonoBehaviour {
 			//solo prendemos el hitbox derecho
 			_rightHitbox.SetActive (true);
 		}
+	}
 
+	void ActivateBothHitbox(){
+		_leftHitbox.SetActive (true);
+		_rightHitbox.SetActive (true);
 	}
 
 	void DeactivateHitbox(){

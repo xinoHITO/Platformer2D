@@ -38,6 +38,7 @@ public class PlayerControl : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
 		_animator = GetComponentInChildren<Animator> ();
 		_healthScript = GetComponent<Health> ();
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer> ();
@@ -60,6 +61,7 @@ public class PlayerControl : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		
 		ReceiveInputs ();
 
 		Dash ();
@@ -73,6 +75,8 @@ public class PlayerControl : MonoBehaviour {
 		ManageKnockback ();
 
 		ManageBlinking ();
+
+		Die ();
 
 		previousHealth = _healthScript._currentHealth;
 	}
@@ -312,6 +316,12 @@ public class PlayerControl : MonoBehaviour {
 			_spriteRenderer.color = currentColor;
 		}
 
+	}
+
+	void Die(){
+		if (_healthScript._currentHealth <= 0) {
+			gameObject.SetActive (false);
+		}
 	}
 
 	void StopBlinking(){
