@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 114872427578673268}
   - component: {fileID: 114851467588621638}
   m_Layer: 0
-  m_Name: bullet 2
+  m_Name: grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,9 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b702f50c0f3164f769da1c7a1437f930, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bulletPrefab: {fileID: 1136571669010540, guid: c68bb0e6cdb5f4bdc85404ccb629a1f6,
+  _bulletPrefab: {fileID: 1241192644550482, guid: 70cfbe1f9c84d4b46bf86cc9d4ade008,
     type: 2}
-  _bulletCount: 4
+  _bulletCount: 1
 --- !u!114 &114872427578673268
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -117,6 +117,8 @@ MonoBehaviour:
   force: 200
   deathTimer: 0.5
   shootRate: 1
+  damage: 20
+  destroyOnTrigger: 1
 --- !u!212 &212475348505034196
 SpriteRenderer:
   m_ObjectHideFlags: 1
