@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 61682433775905058}
   - component: {fileID: 50292934524873046}
   - component: {fileID: 114812163783000844}
+  - component: {fileID: 114177311111513142}
   m_Layer: 0
   m_Name: shotgun shot (5)
   m_TagString: Untagged
@@ -58,6 +59,7 @@ GameObject:
   - component: {fileID: 61976158606094314}
   - component: {fileID: 50800033736644398}
   - component: {fileID: 114540445129944204}
+  - component: {fileID: 114743803056189524}
   m_Layer: 0
   m_Name: shotgun shot (1)
   m_TagString: Untagged
@@ -77,6 +79,7 @@ GameObject:
   - component: {fileID: 61962388965633350}
   - component: {fileID: 50457166533795608}
   - component: {fileID: 114134907707128520}
+  - component: {fileID: 114338149435398440}
   m_Layer: 0
   m_Name: shotgun shot (3)
   m_TagString: Untagged
@@ -96,6 +99,7 @@ GameObject:
   - component: {fileID: 61935205832862540}
   - component: {fileID: 50740301510231046}
   - component: {fileID: 114852686295109102}
+  - component: {fileID: 114332611694168724}
   m_Layer: 0
   m_Name: shotgun shot (6)
   m_TagString: Untagged
@@ -115,6 +119,7 @@ GameObject:
   - component: {fileID: 61782227977737886}
   - component: {fileID: 50596863669952914}
   - component: {fileID: 114183546829864878}
+  - component: {fileID: 114858489836028068}
   m_Layer: 0
   m_Name: shotgun shot (4)
   m_TagString: Untagged
@@ -134,6 +139,7 @@ GameObject:
   - component: {fileID: 61868887424403464}
   - component: {fileID: 50057169592932230}
   - component: {fileID: 114968848648356528}
+  - component: {fileID: 114311265940419234}
   m_Layer: 0
   m_Name: shotgun shot
   m_TagString: Untagged
@@ -153,6 +159,7 @@ GameObject:
   - component: {fileID: 61358454451045240}
   - component: {fileID: 50037358771601142}
   - component: {fileID: 114361151279338908}
+  - component: {fileID: 114250081541628714}
   m_Layer: 0
   m_Name: shotgun shot (2)
   m_TagString: Untagged
@@ -600,7 +607,19 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
+--- !u!114 &114177311111513142
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1283395839560550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
 --- !u!114 &114183546829864878
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -615,7 +634,58 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
+--- !u!114 &114250081541628714
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1891050033887504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
+--- !u!114 &114311265940419234
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1853406776796460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
+--- !u!114 &114332611694168724
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1619337210298430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
+--- !u!114 &114338149435398440
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1448942523278666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
 --- !u!114 &114361151279338908
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -630,7 +700,6 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
 --- !u!114 &114540445129944204
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -645,7 +714,19 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
+--- !u!114 &114743803056189524
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1385996476661634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
 --- !u!114 &114812163783000844
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -660,7 +741,6 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
 --- !u!114 &114852686295109102
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -675,7 +755,19 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
+--- !u!114 &114858489836028068
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1843880706070376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  destroyOnTrigger: 1
 --- !u!114 &114872427578673268
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -690,7 +782,6 @@ MonoBehaviour:
   force: 0
   deathTimer: 3
   shootRate: 1
-  damage: 20
 --- !u!114 &114968848648356528
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -705,7 +796,6 @@ MonoBehaviour:
   force: 1500
   deathTimer: 3
   shootRate: 0.1
-  damage: 20
 --- !u!212 &212371287013758288
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 58628404614794356}
   - component: {fileID: 50164168600265714}
   - component: {fileID: 114608664309489380}
+  - component: {fileID: 114872512307235592}
   m_Layer: 0
   m_Name: explosion
   m_TagString: Untagged
@@ -110,7 +111,18 @@ MonoBehaviour:
   force: 0
   deathTimer: 1.5
   shootRate: 0.1
-  damage: 20
+--- !u!114 &114872512307235592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1241192644550482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec48e2989cd046ecbf6bc0b6623aabf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 40
   destroyOnTrigger: 0
 --- !u!212 &212815935274467276
 SpriteRenderer:
