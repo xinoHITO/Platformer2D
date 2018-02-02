@@ -55,7 +55,7 @@ public class PlayerControl : MonoBehaviour {
 	void FaceMouseCursor(){
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		mousePos.z = 0;
-		transform.right = mousePos - transform.position;
+		transform.right =mousePos - transform.position;
 	}
 
 	void ChangeWeapon(){

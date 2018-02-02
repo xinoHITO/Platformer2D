@@ -13,6 +13,8 @@ public class FollowTarget : MonoBehaviour {
 	void LateUpdate () {
 		Vector3 targetPos = _target.position;
 		targetPos.z = -10;
-		transform.position = Vector3.Lerp (transform.position, targetPos, Time.deltaTime * _lerpSpeed);
+		transform.position = targetPos;
+
+	//	transform.position = Vector3.Lerp (transform.position, targetPos, Time.deltaTime * _lerpSpeed);
 	}
 }
