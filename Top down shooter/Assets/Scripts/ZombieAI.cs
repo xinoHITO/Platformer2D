@@ -36,6 +36,9 @@ public class ZombieAI : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		MakeDecisions ();
+		if (_healthScript._currentHealth <= 0) {
+			Destroy (gameObject);
+		}
 	}
 
 	void FixedUpdate(){
